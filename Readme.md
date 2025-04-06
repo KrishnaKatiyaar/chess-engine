@@ -1,4 +1,4 @@
-# Windows Chess Engine ♟️
+# Chess Engine ♟️
 
 A complete C++ chess engine with AI opponent
 
