@@ -4,10 +4,10 @@ A sophisticated C++ chess engine featuring an intelligent AI opponent and compre
 
 ## Features
 
-- 🎮 Interactive Unicode chess board display
-- 🧠 Advanced AI using Minimax algorithm with alpha-beta pruning
-- ⚡ Efficient move generation for all pieces
-- 📊 Sophisticated position evaluation system including:
+-  Interactive Unicode chess board display
+-  Advanced AI using Minimax algorithm with alpha-beta pruning
+-  Efficient move generation for all pieces
+-  Sophisticated position evaluation system including:
   - Material balance
   - Pawn structure analysis
   - Piece positioning
@@ -16,8 +16,8 @@ A sophisticated C++ chess engine featuring an intelligent AI opponent and compre
   - Legal move validation
   - Check and checkmate detection
   - Stalemate detection
-- 📜 Move history tracking with algebraic notation
-- ↩️ Move undo functionality
+-  Move history tracking with algebraic notation
+-  Move undo functionality
 
 ## Requirements
 
