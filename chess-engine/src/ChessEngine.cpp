@@ -7,7 +7,7 @@ ChessEngine::ChessEngine() {
         Piece::King, Piece::Bishop, Piece::Knight, Piece::Rook,
         Piece::Pawn, Piece::Pawn,   Piece::Pawn,   Piece::Pawn,
         Piece::Pawn, Piece::Pawn,   Piece::Pawn,   Piece::Pawn,
-        Piece::Empty, // ... (fill rest of board)
+        Piece::Empty, 
     };
     std::copy(initialBoard, initialBoard+64, board);
     turn = Color::White;
@@ -59,7 +59,7 @@ void ChessEngine::GenerateBishopMoves(int pos, std::vector<Move>& moves) {
         for(int n = 1; n < 8; n++) {
             int target = pos + n*dir;
             if(target < 0 || target >= 64) break;
-            if(abs((target%8)-(pos%8)) > 2) break; // Prevent wrapping
+            if(abs((target%8)-(pos%8)) > 2) break;
             
             if(board[target] == Piece::Empty) {
                 moves.emplace_back(pos, target);
@@ -74,13 +74,13 @@ void ChessEngine::GenerateBishopMoves(int pos, std::vector<Move>& moves) {
 }
 
 void ChessEngine::GenerateRookMoves(int pos, std::vector<Move>& moves) {
-    const int directions[] = {1, -1, 8, -8}; // Straight directions
+    const int directions[] = {1, -1, 8, -8}; 
     for(int dir : directions) {
         for(int n = 1; n < 8; n++) {
             int target = pos + n*dir;
             if(target < 0 || target >= 64) break;
             if(dir == 1 || dir == -1) {
-                if(target/8 != pos/8) break; // Same row check
+                if(target/8 != pos/8) break;
             }
             
             if(board[target] == Piece::Empty) {
@@ -96,7 +96,7 @@ void ChessEngine::GenerateRookMoves(int pos, std::vector<Move>& moves) {
 }
 
 void ChessEngine::GenerateQueenMoves(int pos, std::vector<Move>& moves) {
-    // Queen = Rook + Bishop
+
     GenerateRookMoves(pos, moves);
     GenerateBishopMoves(pos, moves);
 }
@@ -112,11 +112,9 @@ void ChessEngine::GenerateKingMoves(int pos, std::vector<Move>& moves) {
         }
     }
 }
-// Add to GeneratePawnMoves()
+
 void ChessEngine::GeneratePawnMoves(int pos, std::vector<Move>& moves) {
-    // ... existing pawn moves ...
-    
-    // En passant
+   
     if(!moveHistory.empty()) {
         Move lastMove = moveHistory.back();
         if(board[lastMove.to] == Piece::Pawn && abs(lastMove.from - lastMove.to) == 16) {
@@ -130,17 +128,15 @@ void ChessEngine::GeneratePawnMoves(int pos, std::vector<Move>& moves) {
     }
 }
 
-// Add to GenerateKingMoves()
+
 void ChessEngine::GenerateKingMoves(int pos, std::vector<Move>& moves) {
-    // ... existing king moves ...
-    
-    // Castling
+  
     if(!HasKingMoved(turn)) {
-        // Kingside castling
+       
         if(CanCastleKingside(turn)) {
             moves.emplace_back(pos, pos+2);
         }
-        // Queenside castling
+      
         if(CanCastleQueenside(turn)) {
             moves.emplace_back(pos, pos-2);
         }
@@ -148,18 +144,18 @@ void ChessEngine::GenerateKingMoves(int pos, std::vector<Move>& moves) {
 }
 
 bool ChessEngine::IsMoveLegal(const Move& move) {
-    // Check basic validity
+   
     if(move.from < 0 || move.from >= 64 || move.to < 0 || move.to >= 64) 
         return false;
     
-    // Temporarily make the move
+   
     Piece captured = board[move.to];
     board[move.to] = board[move.from];
     board[move.from] = Piece::Empty;
     
     bool inCheck = IsInCheck(turn);
     
-    // Undo the move
+    
     board[move.from] = board[move.to];
     board[move.to] = captured;
     
@@ -177,7 +173,7 @@ bool ChessEngine::IsInCheck(Color color) {
     
     Color opponent = (color == Color::White) ? Color::Black : Color::White;
     Color originalTurn = turn;
-    turn = opponent; // Temporarily switch turns
+    turn = opponent; 
     
     auto opponentMoves = GenerateMoves();
     turn = originalTurn;
@@ -189,7 +185,7 @@ bool ChessEngine::IsInCheck(Color color) {
 }
 
 bool ChessEngine::HasKingMoved(Color color) {
-    // Check if king has moved from initial position
+    
     int kingPos = (color == Color::White) ? 4 : 60;
     return board[kingPos] != Piece::King;
 }
@@ -213,17 +209,17 @@ int ChessEngine::Evaluate() {
     int score = 0;
     const int pieceValues[] = {0, 100, 320, 330, 500, 900, 20000};
     
-    // Material evaluation
+   
     for(int i = 0; i < 64; i++) {
         if(board[i] != Piece::Empty) {
             int value = pieceValues[static_cast<int>(board[i])];
-            // Add positional bonuses
+            
             value += GetPositionalScore(i, board[i]);
             score += (GetPieceColor(i) == Color::White) ? value : -value;
         }
     }
     
-    // Mobility bonus
+
     int mobility = GenerateMoves().size();
     score += (turn == Color::White) ? mobility : -mobility;
     
@@ -231,7 +227,7 @@ int ChessEngine::Evaluate() {
 }
 
 int ChessEngine::GetPositionalScore(int pos, Piece piece) {
-    // Positional tables for each piece type
+   
     static const int pawnTable[64] = {
         0,  0,  0,  0,  0,  0,  0,  0,
         50, 50, 50, 50, 50, 50, 50, 50,
@@ -243,22 +239,22 @@ int ChessEngine::GetPositionalScore(int pos, Piece piece) {
         0,  0,  0,  0,  0,  0,  0,  0
     };
     
-    // Mirror table for black pieces
+ 
     if(GetPieceColor(pos) == Color::Black) {
         pos = 63 - pos;
     }
     
     switch(piece) {
         case Piece::Pawn: return pawnTable[pos];
-        // Add tables for other pieces
+       
         default: return 0;
     }
 }
 
 void ChessEngine::MakeMove(const Move& move) {
-    // Handle special moves
+    
     if(board[move.from] == Piece::King && abs(move.from - move.to) == 2) {
-        // Castling - move rook too
+        
         int rookFrom = (move.to > move.from) ? move.from+3 : move.from-4;
         int rookTo = (move.to > move.from) ? move.from+1 : move.from-1;
         board[rookTo] = board[rookFrom];
@@ -277,6 +273,6 @@ void ChessEngine::UndoMove(const Move& move) {
     turn = (turn == Color::White) ? Color::Black : Color::White;
     moveHistory.pop_back();
     
-    // TODO: Handle undoing special moves
+   
 }
 
